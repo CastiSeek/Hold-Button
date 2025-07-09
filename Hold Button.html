@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hold Button!</title>
+    <style>
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        @keyframes press {
+            0% { transform: scale(1); box-shadow: 0 0 0 rgba(255, 255, 255, 0.4); }
+            50% { transform: scale(0.95); box-shadow: 0 0 20px rgba(255, 255, 255, 0.2); }
+            100% { transform: scale(1); box-shadow: 0 0 0 rgba(255, 255, 255, 0.4); }
+        }
+        
+        @keyframes rotateText {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        
+        @keyframes rainbowBackground {
+            0% { background-color: #ff0000; }
+            14% { background-color: #ff7f00; }
+            28% { background-color: #ffff00; }
+            42% { background-color: #00ff00; }
+            57% { background-color: #0000ff; }
+            71% { background-color: #4b0082; }
+            85% { background-color: #9400d3; }
+            100% { background-color: #ff0000; }
+        }
+        
+        @keyframes rainbowButton {
+            0% { background-color: rgba(255, 0, 0, 0.9); }
+            14% { background-color: rgba(255, 127, 0, 0.9); }
+            28% { background-color: rgba(255, 255, 0, 0.9); }
+            42% { background-color: rgba(0, 255, 0, 0.9); }
+            57% { background-color: rgba(0, 0, 255, 0.9); }
+            71% { background-color: rgba(75, 0, 130, 0.9); }
+            85% { background-color: rgba(148, 0, 211, 0.9); }
+            100% { background-color: rgba(255, 0, 0, 0.9); }
+        }
+        
+        body {
+            font-family: 'Roboto', Arial, sans-serif;
+            background-color: #121212;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+            color: #ffffff;
+            animation: fadeIn 0.5s ease-out;
+            transition: background-color 2s ease;
+        }
+        
+        body.day-mode {
+            background-color: #87CEEB;
+            color: #333;
+        }
+        
+        body.day-mode .hold-btn {
+            color: #333;
+            border-color: rgba(0, 0, 0, 0.3);
+        }
+        
+        body.day-mode .leaderboards-btn {
+            background-color: rgba(0, 100, 255, 0.7);
+        }
+        
+        body.day-mode #nickname {
+            background-color: rgba(255, 255, 255, 0.7);
+            color: #333;
+        }
+        
+        .nickname-container {
+            margin-bottom: 30px;
+            text-align: center;
+            animation: fadeIn 0.7s ease-out;
+        }
+        
+        #nickname {
+            padding: 12px 20px;
+            border: 2px solid #4d94ff;
+            border-radius: 25px;
+            font-size: 16px;
+            outline: none;
+            background-color: rgba(255, 255, 255, 0.1);
+            color: white;
+            width: 250px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+        
+        #nickname:focus {
+            border-color: #66a3ff;
+            box-shadow: 0 0 10px rgba(102, 163, 255, 0.5);
+        }
+        
+        .timer {
+            font-size: 28px;
+            margin: 30px 0;
+            height: 40px;
+            color: #ffffff;
+            font-weight: bold;
+            text-shadow: 0 0 10px rgba(102, 163, 255, 0.7);
+            animation: fadeIn 0.9s ease-out;
+        }
+        
+        body.day-mode .timer {
+            color: #333;
+            text-shadow: 0 0 10px rgba(0, 100, 255, 0.5);
+        }
+        
+        .hold-btn {
+            width: 150px;
+            height: 150px;
+            font-size: 20px;
+            background-color: rgba(77, 148, 255, 0.2);
+            color: white;
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            outline: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 1.1s ease-out, pulse 2s infinite;
+            box-shadow: 0 0 20px rgba(77, 148, 255, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .hold-btn.holding {
+            background-color: rgba(255, 255, 255, 0.9);
+            color: #4d94ff;
+            border-color: rgba(77, 148, 255, 0.8);
+            animation: press 0.5s infinite;
+            box-shadow: 0 0 30px rgba(77, 148, 255, 0.6);
+        }
+        
+        .hold-btn.rotating-text span {
+            display: inline-block;
+            animation: rotateText 10s linear infinite;
+        }
+        
+        .leaderboards-btn {
+            margin-top: 40px;
+            padding: 12px 30px;
+            background-color: rgba(77, 148, 255, 0.7);
+            color: white;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            animation: fadeIn 1.3s ease-out;
+        }
+        
+        .leaderboards-btn:hover {
+            background-color: rgba(77, 148, 255, 0.9);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+            animation: fadeIn 0.3s ease-out;
+        }
+        
+        .modal-content {
+            background-color: #1e1e1e;
+            padding: 25px;
+            border-radius: 15px;
+            max-width: 80%;
+            max-height: 80%;
+            overflow-y: auto;
+            width: 350px;
+            box-shadow: 0 5px 30px rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        body.day-mode .modal-content {
+            background-color: #f5f5f5;
+            color: #333;
+        }
+        
+        .leaderboard-entry {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.2s ease;
+        }
+        
+        body.day-mode .leaderboard-entry {
+            border-bottom-color: rgba(0, 0, 0, 0.1);
+        }
+        
+        .leaderboard-entry:hover {
+            background-color: rgba(255, 255, 255, 0.05);
+            transform: translateX(5px);
+        }
+        
+        body.day-mode .leaderboard-entry:hover {
+            background-color: rgba(0, 0, 0, 0.05);
+        }
+        
+        .close-btn {
+            float: right;
+            cursor: pointer;
+            font-size: 24px;
+            font-weight: bold;
+            color: rgba(255, 255, 255, 0.5);
+            transition: all 0.2s ease;
+        }
+        
+        body.day-mode .close-btn {
+            color: rgba(0, 0, 0, 0.5);
+        }
+        
+        .close-btn:hover {
+            color: white;
+            transform: scale(1.2);
+        }
+        
+        body.day-mode .close-btn:hover {
+            color: black;
+        }
+        
+        h2 {
+            color: #4d94ff;
+            margin-top: 0;
+            text-align: center;
+        }
+        
+        body.day-mode h2 {
+            color: #0064ff;
+        }
+        
+        /* Rainbow effects */
+        body.rainbow-mode {
+            animation: rainbowBackground 10s linear infinite;
+        }
+        
+        .hold-btn.rainbow-mode {
+            animation: rainbowButton 5s linear infinite, press 0.5s infinite;
+        }
+    </style>
+</head>
+<body>
+    <div class="nickname-container">
+        <input type="text" id="nickname" placeholder="Enter your nickname" maxlength="20">
+    </div>
+    
+    <div class="timer" id="timer"></div>
+    
+    <button class="hold-btn" id="holdBtn"><span>Hold Me</span></button>
+    
+    <button class="leaderboards-btn" id="leaderboardsBtn">Leaderboards</button>
+    
+    <div class="modal" id="leaderboardsModal">
+        <div class="modal-content">
+            <span class="close-btn" id="closeModal">&times;</span>
+            <h2>Leaderboards</h2>
+            <div id="leaderboardsList"></div>
+        </div>
+    </div>
+    
+    <audio id="pressSound" src="https://assets.mixkit.co/sfx/preview/mixkit-modern-click-box-check-1120.mp3" preload="auto"></audio>
+    <audio id="releaseSound" src="https://assets.mixkit.co/sfx/preview/mixkit-positive-interface-beep-221.mp3" preload="auto"></audio>
+    <audio id="successSound" src="https://assets.mixkit.co/sfx/preview/mixkit-achievement-bell-600.mp3" preload="auto"></audio>
+    <audio id="clickSound" src="https://www.dropbox.com/scl/fi/knfn0tq22dkn230xm6asd/click-tap-computer-mouse-352734.mp3?rlkey=mbjgmghoi2pdzqzi5410ks9t1&st=kykur71h&dl=1" preload="auto"></audio>
+    
+    <script>
+        const holdBtn = document.getElementById('holdBtn');
+        const timer = document.getElementById('timer');
+        const nicknameInput = document.getElementById('nickname');
+        const leaderboardsBtn = document.getElementById('leaderboardsBtn');
+        const leaderboardsModal = document.getElementById('leaderboardsModal');
+        const leaderboardsList = document.getElementById('leaderboardsList');
+        const closeModal = document.getElementById('closeModal');
+        const body = document.body;
+        
+        const pressSound = document.getElementById('pressSound');
+        const releaseSound = document.getElementById('releaseSound');
+        const successSound = document.getElementById('successSound');
+        const clickSound = document.getElementById('clickSound');
+        
+        let startTime;
+        let interval;
+        let isHolding = false;
+        let vibrationInterval;
+        let dayNightInterval;
+        let isDayMode = false;
+        let holdSeconds = 0;
+        
+        // Load leaderboards from localStorage
+        let leaderboards = JSON.parse(localStorage.getItem('holdButtonLeaderboards')) || [];
+        
+        // Set up event listeners
+        holdBtn.addEventListener('mousedown', startHold);
+        holdBtn.addEventListener('touchstart', startHold);
+        
+        holdBtn.addEventListener('mouseup', endHold);
+        holdBtn.addEventListener('touchend', endHold);
+        holdBtn.addEventListener('mouseleave', endHold);
+        
+        leaderboardsBtn.addEventListener('click', showLeaderboards);
+        closeModal.addEventListener('click', hideLeaderboards);
+        
+        // Add click sound to all buttons except Hold
+        document.querySelectorAll('button:not(#holdBtn)').forEach(btn => {
+            btn.addEventListener('click', playClickSound);
+        });
+        
+        // Add click sound to nickname input
+        nicknameInput.addEventListener('input', playClickSound);
+        
+        // Preload sounds
+        window.addEventListener('load', () => {
+            pressSound.volume = 0.3;
+            releaseSound.volume = 0.3;
+            successSound.volume = 0.5;
+            clickSound.volume = 0.3;
+        });
+        
+        function playClickSound() {
+            clickSound.currentTime = 0;
+            clickSound.play();
+        }
+        
+        function startHold(e) {
+            e.preventDefault();
+            if (isHolding || !nicknameInput.value.trim()) return;
+            
+            isHolding = true;
+            holdBtn.classList.add('holding');
+            startTime = Date.now();
+            
+            // Reset all Easter egg effects
+            body.classList.remove('day-mode', 'rainbow-mode');
+            holdBtn.classList.remove('rotating-text', 'rainbow-mode');
+            clearInterval(dayNightInterval);
+            
+            // Play press sound
+            pressSound.currentTime = 0;
+            pressSound.play();
+            
+            // Start vibration (every 1000ms - в 2 раза реже)
+            if (navigator.vibrate) {
+                navigator.vibrate(50); // Initial vibration
+                vibrationInterval = setInterval(() => {
+                    navigator.vibrate(50);
+                }, 1000); // Changed from 500ms to 1000ms
+            }
+            
+            interval = setInterval(() => {
+                const elapsed = Date.now() - startTime;
+                timer.textContent = formatTime(elapsed);
+                
+                // Update hold time for Easter eggs
+                holdSeconds = elapsed / 1000;
+                
+                // Easter eggs based on hold time
+                if (holdSeconds >= 60) {
+                    // Day/night cycle every 30 seconds after 60 seconds
+                    if (!dayNightInterval) {
+                        toggleDayNight(); // Initial toggle
+                        dayNightInterval = setInterval(toggleDayNight, 30000);
+                    }
+                }
+                
+                if (holdSeconds >= 120) {
+                    // Rotating text after 120 seconds
+                    holdBtn.classList.add('rotating-text');
+                }
+                
+                if (holdSeconds >= 350) {
+                    // Rainbow background after 350 seconds
+                    body.classList.add('rainbow-mode');
+                }
+                
+                if (holdSeconds >= 500) {
+                    // Rainbow button after 500 seconds
+                    holdBtn.classList.add('rainbow-mode');
+                }
+                
+                // Change button color based on hold time
+                if (holdSeconds > 5) {
+                    holdBtn.style.backgroundColor = 'rgba(255, 215, 0, 0.9)';
+                    holdBtn.style.boxShadow = '0 0 30px rgba(255, 215, 0, 0.6)';
+                } else if (holdSeconds > 3) {
+                    holdBtn.style.backgroundColor = 'rgba(255, 165, 0, 0.9)';
+                    holdBtn.style.boxShadow = '0 0 30px rgba(255, 165, 0, 0.6)';
+                }
+            }, 10);
+        }
+        
+        function toggleDayNight() {
+            isDayMode = !isDayMode;
+            if (isDayMode) {
+                body.classList.add('day-mode');
+            } else {
+                body.classList.remove('day-mode');
+            }
+        }
+        
+        function endHold(e) {
+            e.preventDefault();
+            if (!isHolding) return;
+            
+            clearInterval(interval);
+            clearInterval(vibrationInterval);
+            clearInterval(dayNightInterval);
+            isHolding = false;
+            holdBtn.classList.remove('holding', 'rotating-text', 'rainbow-mode');
+            body.classList.remove('rainbow-mode', 'day-mode');
+            
+            // Reset button color
+            holdBtn.style.backgroundColor = '';
+            holdBtn.style.boxShadow = '';
+            
+            const elapsed = Date.now() - startTime;
+            timer.textContent = '';
+            
+            // Play release sound
+            releaseSound.currentTime = 0;
+            releaseSound.play();
+            
+            if (elapsed > 100) { // Minimum 100ms to count
+                saveResult(elapsed);
+                
+                // Play success sound for holds longer than 1 second
+                if (elapsed > 1000) {
+                    setTimeout(() => {
+                        successSound.currentTime = 0;
+                        successSound.play();
+                    }, 200);
+                }
+            }
+        }
+        
+        function formatTime(ms) {
+            const seconds = Math.floor(ms / 1000);
+            const milliseconds = Math.floor((ms % 1000) / 10);
+            return `${seconds}.${milliseconds.toString().padStart(2, '0')}s`;
+        }
+        
+        function saveResult(time) {
+            const nickname = nicknameInput.value.trim();
+            
+            // Check if this nickname already has a record
+            const existingIndex = leaderboards.findIndex(entry => entry.nickname === nickname);
+            
+            if (existingIndex !== -1) {
+                // Update if new time is better
+                if (time > leaderboards[existingIndex].time) {
+                    leaderboards[existingIndex].time = time;
+                }
+            } else {
+                // Add new record
+                leaderboards.push({
+                    nickname: nickname,
+                    time: time
+                });
+            }
+            
+            // Sort leaderboards by time (descending)
+            leaderboards.sort((a, b) => b.time - a.time);
+            
+            // Keep only top 100 records
+            if (leaderboards.length > 100) {
+                leaderboards = leaderboards.slice(0, 100);
+            }
+            
+            // Save to localStorage
+            localStorage.setItem('holdButtonLeaderboards', JSON.stringify(leaderboards));
+        }
+        
+        function showLeaderboards() {
+            leaderboardsList.innerHTML = '';
+            
+            if (leaderboards.length === 0) {
+                leaderboardsList.innerHTML = '<p style="text-align: center; color: rgba(255,255,255,0.5);">No records yet. Be the first!</p>';
+            } else {
+                leaderboards.forEach((entry, index) => {
+                    const entryElement = document.createElement('div');
+                    entryElement.className = 'leaderboard-entry';
+                    
+                    const medal = index < 3 ? ['🥇', '🥈', '🥉'][index] : `${index + 1}.`;
+                    
+                    entryElement.innerHTML = `
+                        <span>${medal} ${entry.nickname}</span>
+                        <span style="color: #4d94ff; font-weight: bold;">${formatTime(entry.time)}</span>
+                    `;
+                    leaderboardsList.appendChild(entryElement);
+                });
+            }
+            
+            leaderboardsModal.style.display = 'flex';
+        }
+        
+        function hideLeaderboards() {
+            leaderboardsModal.style.display = 'none';
+        }
+        
+        // Close modal when clicking outside
+        window.addEventListener('click', (e) => {
+            if (e.target === leaderboardsModal) {
+                hideLeaderboards();
+            }
+        });
+        
+        // Add Android-like touch feedback
+        const buttons = [holdBtn, leaderboardsBtn];
+        buttons.forEach(btn => {
+            btn.addEventListener('touchstart', () => {
+                btn.style.transform = 'scale(0.95)';
+            });
+            
+            btn.addEventListener('touchend', () => {
+                btn.style.transform = '';
+            });
+        });
+    </script>
+</body>
+</html>
